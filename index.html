@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>齿轮比计算器</title>
     <style>
+        /* 原有样式保持不变 */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -22,20 +23,13 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-            color: #333;
-            font-weight: bold;
-        }
         input {
             width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 8px;
+            margin: 5px 0;
             border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: 4px;
             box-sizing: border-box;
-            font-size: 16px;
         }
         .result {
             background: #e8f4ff;
@@ -45,12 +39,31 @@
         }
         h3 {
             color: #333;
-            margin: 0 0 15px 0;
-            font-size: 18px;
+            margin: 0 0 10px 0;
         }
         .output-line {
+            margin: 8px 0;
+        }
+        /* 新增按钮样式 */
+        .u-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             margin: 10px 0;
-            line-height: 1.5;
+        }
+        .u-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            border: 1px solid #007bff;
+            background: #fff;
+            font-size: 20px;
+            color: #007bff;
+            cursor: pointer;
+        }
+        .u-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -58,17 +71,10 @@
     <div class="container">
         <div class="input-group">
             <h3>输入参数</h3>
-            <label for="A">编码器线数（A）：</label>
-            <input type="number" id="A" value="1000" placeholder="输入数值">
-            
-            <label for="B">编码器齿轮数（B）：</label>
-            <input type="number" id="B" placeholder="输入数值">
-            
-            <label for="C">主轴齿轮数（C）：</label>
-            <input type="number" id="C" placeholder="输入数值">
-            
-            <label for="D">龙头比例（D）：</label>
-            <input type="number" id="D" step="0.01" placeholder="输入比例值">
+            <input type="number" id="A" placeholder="编码器线数（A）" value="1000">
+            <input type="number" id="B" placeholder="编码器齿轮数（B）">
+            <input type="number" id="C" placeholder="主轴齿轮数（C）">
+            <input type="number" id="D" placeholder="龙头比例（D）" step="0.01">
         </div>
 
         <div class="input-group">
@@ -80,13 +86,54 @@
                 <div class="output-line">最大公约数 Z = <span id="Z">0</span></div>
                 <div class="output-line">简约分子 X₁ = <span id="X1">0</span></div>
                 <div class="output-line">简约分母 Y₁ = <span id="Y1">0</span></div>
+                <hr>
+                <!-- 新增公约数控制区域 -->
+                <div class="u-control">
+                    <button class="u-btn" id="uDown">-</button>
+                    <div>当前公约数 U = <span id="U">0</span></div>
+                    <button class="u-btn" id="uUp">+</button>
+                </div>
+                <div class="output-line">当前分子 X₂ = <span id="X2">0</span></div>
+                <div class="output-line">当前分母 Y₂ = <span id="Y2">0</span></div>
             </div>
         </div>
     </div>
 
     <script>
+        let currentUIndex = 0;
+        let commonDivisors = [];
+
+        function getAllCommonDivisors(x, y) {
+            const gcd = calculateGCD(x, y);
+            if (gcd === 0) return [];
+            
+            const divisors = [];
+            for(let i = 1; i <= Math.sqrt(gcd); i++) {
+                if(gcd % i === 0) {
+                    divisors.push(i);
+                    if(i !== gcd/i) divisors.push(gcd/i);
+                }
+            }
+            return divisors.sort((a,b) => b - a); // 从大到小排序
+        }
+
         function calculateGCD(a, b) {
             return b ? calculateGCD(b, a % b) : a;
+        }
+
+        function updateUControls() {
+            const uValue = commonDivisors[currentUIndex] || 0;
+            document.getElementById('U').textContent = uValue;
+            
+            const X = parseFloat(document.getElementById('X').textContent) || 0;
+            const Y = parseFloat(document.getElementById('Y').textContent) || 0;
+            
+            document.getElementById('X2').textContent = uValue ? (X/uValue).toFixed(2) : '-';
+            document.getElementById('Y2').textContent = uValue ? (Y/uValue).toFixed(2) : '-';
+            
+            // 控制按钮状态
+            document.getElementById('uDown').disabled = currentUIndex >= commonDivisors.length - 1;
+            document.getElementById('uUp').disabled = currentUIndex <= 0;
         }
 
         function updateResults() {
@@ -100,23 +147,39 @@
             const X = 131072 * B;
             const Y = A * 4 * C * D;
 
-            // 计算最大公约数
-            const Z = Y !== 0 ? calculateGCD(X, Y) : 0;
+            // 计算公约数
+            commonDivisors = getAllCommonDivisors(X, Y);
+            currentUIndex = commonDivisors.length > 0 ? 0 : -1;
 
             // 更新显示
             document.getElementById('X').textContent = X;
             document.getElementById('Y').textContent = Y;
-            document.getElementById('Z').textContent = Z;
-            document.getElementById('X1').textContent = Z !== 0 ? (X/Z).toFixed(2) : 0;
-            document.getElementById('Y1').textContent = Z !== 0 ? (Y/Z).toFixed(2) : 0;
+            document.getElementById('Z').textContent = commonDivisors[0] || 0;
+            document.getElementById('X1').textContent = commonDivisors[0] ? (X/commonDivisors[0]).toFixed(2) : '-';
+            document.getElementById('Y1').textContent = commonDivisors[0] ? (Y/commonDivisors[0]).toFixed(2) : '-';
+            
+            updateUControls();
         }
 
-        // 为所有输入框添加事件监听
+        // 按钮事件
+        document.getElementById('uUp').addEventListener('click', () => {
+            if(currentUIndex > 0) {
+                currentUIndex--;
+                updateUControls();
+            }
+        });
+
+        document.getElementById('uDown').addEventListener('click', () => {
+            if(currentUIndex < commonDivisors.length - 1) {
+                currentUIndex++;
+                updateUControls();
+            }
+        });
+
+        // 初始化事件监听
         document.querySelectorAll('input').forEach(input => {
             input.addEventListener('input', updateResults);
         });
-
-        // 初始化计算
         updateResults();
     </script>
 </body>
