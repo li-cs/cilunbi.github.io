@@ -22,13 +22,20 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #333;
+            font-weight: bold;
+        }
         input {
             width: 100%;
-            padding: 8px;
-            margin: 5px 0;
+            padding: 10px;
+            margin-bottom: 10px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             box-sizing: border-box;
+            font-size: 16px;
         }
         .result {
             background: #e8f4ff;
@@ -38,10 +45,12 @@
         }
         h3 {
             color: #333;
-            margin: 0 0 10px 0;
+            margin: 0 0 15px 0;
+            font-size: 18px;
         }
         .output-line {
-            margin: 8px 0;
+            margin: 10px 0;
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -49,10 +58,17 @@
     <div class="container">
         <div class="input-group">
             <h3>输入参数</h3>
-            <input type="number" id="A" placeholder="编码器线数（A）">
-            <input type="number" id="B" placeholder="编码器齿轮数（B）">
-            <input type="number" id="C" placeholder="主轴齿轮数（C）">
-            <input type="number" id="D" placeholder="龙头比例（D）" step="0.01">
+            <label for="A">编码器线数（A）：</label>
+            <input type="number" id="A" value="1000" placeholder="输入数值">
+            
+            <label for="B">编码器齿轮数（B）：</label>
+            <input type="number" id="B" placeholder="输入数值">
+            
+            <label for="C">主轴齿轮数（C）：</label>
+            <input type="number" id="C" placeholder="输入数值">
+            
+            <label for="D">龙头比例（D）：</label>
+            <input type="number" id="D" step="0.01" placeholder="输入比例值">
         </div>
 
         <div class="input-group">
@@ -74,8 +90,8 @@
         }
 
         function updateResults() {
-            // 获取输入值
-            const A = parseFloat(document.getElementById('A').value) || 0;
+            // 获取输入值（A默认1000）
+            const A = parseFloat(document.getElementById('A').value) || 1000;
             const B = parseFloat(document.getElementById('B').value) || 0;
             const C = parseFloat(document.getElementById('C').value) || 0;
             const D = parseFloat(document.getElementById('D').value) || 0;
@@ -91,8 +107,8 @@
             document.getElementById('X').textContent = X;
             document.getElementById('Y').textContent = Y;
             document.getElementById('Z').textContent = Z;
-            document.getElementById('X1').textContent = Z !== 0 ? X/Z : 0;
-            document.getElementById('Y1').textContent = Z !== 0 ? Y/Z : 0;
+            document.getElementById('X1').textContent = Z !== 0 ? (X/Z).toFixed(2) : 0;
+            document.getElementById('Y1').textContent = Z !== 0 ? (Y/Z).toFixed(2) : 0;
         }
 
         // 为所有输入框添加事件监听
