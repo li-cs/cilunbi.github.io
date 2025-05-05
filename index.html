@@ -1,52 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>简易计算器</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>齿轮比计算器</title>
     <style>
-        /* 基础样式 */
-        body { font-family: Arial; max-width: 400px; margin: 20px auto; padding: 20px; }
-        .input-group { margin: 10px 0; }
-        input { padding: 8px; width: 200px; }
-        button { 
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: #f0f0f0;
         }
-        #result { margin-top: 20px; font-size: 18px; }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .input-group {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .result {
+            background: #e8f4ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        h3 {
+            color: #333;
+            margin: 0 0 10px 0;
+        }
+        .output-line {
+            margin: 8px 0;
+        }
     </style>
 </head>
 <body>
-    <h2>简易计算器</h2>
-    
-    <!-- 输入区域 -->
-    <div class="input-group">
-        数值1: <input type="number" id="num1" step="any">
+    <div class="container">
+        <div class="input-group">
+            <h3>输入参数</h3>
+            <input type="number" id="A" placeholder="编码器线数（A）">
+            <input type="number" id="B" placeholder="编码器齿轮数（B）">
+            <input type="number" id="C" placeholder="主轴齿轮数（C）">
+            <input type="number" id="D" placeholder="龙头比例（D）" step="0.01">
+        </div>
+
+        <div class="input-group">
+            <h3>计算结果</h3>
+            <div class="result">
+                <div class="output-line">分子 X = <span id="X">0</span></div>
+                <div class="output-line">分母 Y = <span id="Y">0</span></div>
+                <hr>
+                <div class="output-line">最大公约数 Z = <span id="Z">0</span></div>
+                <div class="output-line">简约分子 X₁ = <span id="X1">0</span></div>
+                <div class="output-line">简约分母 Y₁ = <span id="Y1">0</span></div>
+            </div>
+        </div>
     </div>
-    <div class="input-group">
-        数值2: <input type="number" id="num2" step="any">
-    </div>
-    
-    <button onclick="calculate()">开始计算</button>
-    
-    <!-- 结果显示 -->
-    <div id="result"></div>
 
     <script>
-        // 自定义计算逻辑（示例：两数相加）
-        function calculate() {
-            // 获取输入值
-            const num1 = parseFloat(document.getElementById('num1').value);
-            const num2 = parseFloat(document.getElementById('num2').value);
-            
-            // 执行计算
-            const result = num1 + num2;  // 修改此处实现你的计算逻辑
-            
-            // 显示结果
-            document.getElementById('result').innerHTML = 
-                `计算结果：${result}`;
+        function calculateGCD(a, b) {
+            return b ? calculateGCD(b, a % b) : a;
         }
+
+        function updateResults() {
+            // 获取输入值
+            const A = parseFloat(document.getElementById('A').value) || 0;
+            const B = parseFloat(document.getElementById('B').value) || 0;
+            const C = parseFloat(document.getElementById('C').value) || 0;
+            const D = parseFloat(document.getElementById('D').value) || 0;
+
+            // 计算基础值
+            const X = 131072 * B;
+            const Y = A * 4 * C * D;
+
+            // 计算最大公约数
+            const Z = Y !== 0 ? calculateGCD(X, Y) : 0;
+
+            // 更新显示
+            document.getElementById('X').textContent = X;
+            document.getElementById('Y').textContent = Y;
+            document.getElementById('Z').textContent = Z;
+            document.getElementById('X1').textContent = Z !== 0 ? X/Z : 0;
+            document.getElementById('Y1').textContent = Z !== 0 ? Y/Z : 0;
+        }
+
+        // 为所有输入框添加事件监听
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', updateResults);
+        });
+
+        // 初始化计算
+        updateResults();
     </script>
 </body>
 </html>
