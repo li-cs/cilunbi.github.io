@@ -94,7 +94,7 @@
             <h3>输入参数</h3>
 
             <div class="param-group">
-                <label class="param-label">编码器线数（A）：</label>
+                <label class="param-label">编码器线数(增需x4)（A）：</label>
                 <input type="number" class="param-input" id="A" value="1000">
             </div>
 			
@@ -106,18 +106,17 @@
 
             <div class="param-group">
                 <label class="param-label">编码器齿轮数（B）：</label>
-                <input type="number" class="param-input" id="B" placeholder="请输入">
+                <input type="number" class="param-input" id="B" value="28">
             </div>
 
             <div class="param-group">
                 <label class="param-label">主轴齿轮数（C）：</label>
-                <input type="number" class="param-input" id="C" placeholder="请输入">
+                <input type="number" class="param-input" id="C" value="40">
             </div>
 
             <div class="param-group">
                 <label class="param-label">龙头比例（D）龙头1圈 主轴D圈：</label>
-                <input type="number" class="param-input" id="D" step="0.01" placeholder="请输入小数">
-                <input type="number" class="param-input" id="D" step="0.01" placeholder="请输入">
+                <input type="number" class="param-input" id="D" step="0.01" value="2">
             </div>
         </div>
 
@@ -197,7 +196,7 @@
 
             // 计算基础值
             const X = M * B;
-            const Y = A * 4 * C * D;
+            const Y = A * C * D;
 
             // 计算公约数
             commonDivisors = getAllCommonDivisors(X, Y);
