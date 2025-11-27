@@ -1,3 +1,4 @@
+@@ -1,232 +1,232 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -91,11 +92,17 @@
         <!-- 输入参数部分 -->
         <div class="input-group">
             <h3>输入参数</h3>
-            
+
             <div class="param-group">
                 <label class="param-label">编码器线数（A）：</label>
                 <input type="number" class="param-input" id="A" value="1000">
             </div>
+			
+			<div class="param-group">
+                <label class="param-label">电机分辨率20480、131072（M）：</label>
+                <input type="number" class="param-input" id="M" value="20480">
+            </div>
+			
 
             <div class="param-group">
                 <label class="param-label">编码器齿轮数（B）：</label>
@@ -109,6 +116,7 @@
 
             <div class="param-group">
                 <label class="param-label">龙头比例（D）龙头1圈 主轴D圈：</label>
+                <input type="number" class="param-input" id="D" step="0.01" placeholder="请输入小数">
                 <input type="number" class="param-input" id="D" step="0.01" placeholder="请输入">
             </div>
         </div>
@@ -120,7 +128,7 @@
                 <div class="output-line">分子 X = <span id="X">0</span></div>
                 <div class="output-line">分母 Y = <span id="Y">0</span></div>
                 <hr>
-                
+
                 <div class="output-line">最大公约数 Z = <span id="Z">0</span></div>
                 <div class="output-line">简约分子 X₁ = <span id="X1">0</span></div>
                 <div class="output-line">简约分母 Y₁ = <span id="Y1">0</span></div>
@@ -132,7 +140,7 @@
                     <div>当前公约数 U = <span id="U">0</span></div>
                     <button class="u-btn" id="uUp">+</button>
                 </div>
-                
+
                 <div class="output-line">当前分子 X₂ = <span id="X2">0</span></div>
                 <div class="output-line">当前分母 Y₂ = <span id="Y2">0</span></div>
             </div>
@@ -152,7 +160,7 @@
         function getAllCommonDivisors(x, y) {
             const gcd = calculateGCD(x, y);
             if (gcd === 0) return [];
-            
+
             const divisors = new Set();
             for(let i = 1; i <= Math.sqrt(gcd); i++) {
                 if(gcd % i === 0) {
@@ -167,13 +175,13 @@
         function updateUControls() {
             const uValue = commonDivisors[currentUIndex] || 0;
             document.getElementById('U').textContent = uValue;
-            
+
             const X = parseFloat(document.getElementById('X').textContent) || 0;
             const Y = parseFloat(document.getElementById('Y').textContent) || 0;
-            
+
             document.getElementById('X2').textContent = uValue ? (X/uValue).toFixed(2) : '-';
             document.getElementById('Y2').textContent = uValue ? (Y/uValue).toFixed(2) : '-';
-            
+
             // 控制按钮状态
             document.getElementById('uDown').disabled = currentUIndex >= commonDivisors.length - 1;
             document.getElementById('uUp').disabled = currentUIndex <= 0;
@@ -188,7 +196,7 @@
             const D = parseFloat(document.getElementById('D').value) || 0;
 
             // 计算基础值
-            const X = 131072 * B;
+            const X = M * B;
             const Y = A * 4 * C * D;
 
             // 计算公约数
@@ -201,7 +209,7 @@
             document.getElementById('Z').textContent = commonDivisors[0] || 0;
             document.getElementById('X1').textContent = commonDivisors[0] ? (X/commonDivisors[0]).toFixed(2) : '-';
             document.getElementById('Y1').textContent = commonDivisors[0] ? (Y/commonDivisors[0]).toFixed(2) : '-';
-            
+
             updateUControls();
         }
 
